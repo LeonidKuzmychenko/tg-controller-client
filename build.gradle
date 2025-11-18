@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group = 'lk.tech'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client:2.2.1'
+    implementation 'tools.jackson.core:jackson-databind:3.0.2'
+
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
+}
