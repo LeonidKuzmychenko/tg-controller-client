@@ -1,6 +1,6 @@
-package lk.tech.commands.impl;
+package lk.tech.tgcontrollerclient.commands.impl;
 
-import lk.tech.dto.Answer;
+import lk.tech.tgcontrollerclient.dto.Answer;
 import lombok.Getter;
 
 @Getter

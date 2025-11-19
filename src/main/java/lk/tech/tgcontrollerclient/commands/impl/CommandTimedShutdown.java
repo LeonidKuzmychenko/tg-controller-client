@@ -1,8 +1,8 @@
-package lk.tech.commands.impl;
+package lk.tech.tgcontrollerclient.commands.impl;
 
-import lk.tech.dto.Answer;
+import lk.tech.tgcontrollerclient.dto.Answer;
 
-public class CommandShutdown extends AbstractCommand {
+public class CommandTimedShutdown extends AbstractCommand {
 
     @Override
     public Answer run(String command) {
@@ -18,6 +18,6 @@ public class CommandShutdown extends AbstractCommand {
 
     @Override
     public String condition() {
-        return "/shutdown";
+        return "/shutdown_by_time";
     }
 }

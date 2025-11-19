@@ -1,4 +1,4 @@
-package lk.tech;
+package lk.tech.tgcontrollerclient;
 
 import java.awt.*;
 

@@ -1,4 +1,4 @@
-package lk.tech.dto;
+package lk.tech.tgcontrollerclient.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

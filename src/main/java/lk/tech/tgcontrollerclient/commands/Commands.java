@@ -1,10 +1,10 @@
-package lk.tech.commands;
+package lk.tech.tgcontrollerclient.commands;
 
-import lk.tech.commands.impl.AbstractCommand;
-import lk.tech.commands.impl.CommandScreenshot;
-import lk.tech.commands.impl.CommandShutdown;
-import lk.tech.commands.impl.CommandTimedShutdown;
-import lk.tech.dto.Answer;
+import lk.tech.tgcontrollerclient.commands.impl.AbstractCommand;
+import lk.tech.tgcontrollerclient.commands.impl.CommandScreenshot;
+import lk.tech.tgcontrollerclient.commands.impl.CommandShutdown;
+import lk.tech.tgcontrollerclient.commands.impl.CommandTimedShutdown;
+import lk.tech.tgcontrollerclient.dto.Answer;
 
 import java.util.ArrayList;
 import java.util.List;

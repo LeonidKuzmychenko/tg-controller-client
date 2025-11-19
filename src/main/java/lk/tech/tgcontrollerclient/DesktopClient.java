@@ -1,8 +1,8 @@
-package lk.tech;
+package lk.tech.tgcontrollerclient;
 
 import jakarta.websocket.*;
-import lk.tech.commands.Commands;
-import lk.tech.dto.Answer;
+import lk.tech.tgcontrollerclient.commands.Commands;
+import lk.tech.tgcontrollerclient.dto.Answer;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.URI;

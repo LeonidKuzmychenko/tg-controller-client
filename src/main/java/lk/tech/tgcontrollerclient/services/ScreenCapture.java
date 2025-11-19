@@ -1,4 +1,4 @@
-package lk.tech.services;
+package lk.tech.tgcontrollerclient.services;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

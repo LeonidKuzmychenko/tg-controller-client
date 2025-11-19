@@ -1,7 +1,7 @@
-package lk.tech;
+package lk.tech.tgcontrollerclient;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    void main() throws Exception {
         DesktopApp app = new DesktopApp();
         app.start();
     }
