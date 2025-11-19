@@ -25,6 +25,9 @@ public class Commands {
     }
 
     public Answer analyze(String command) {
-        return firstCommand.analyze(command);
+        System.out.println("Command: " + command);
+        Answer answer = firstCommand.analyze(command);
+        System.out.println("Answer: " + answer);
+        return answer;
     }
 }

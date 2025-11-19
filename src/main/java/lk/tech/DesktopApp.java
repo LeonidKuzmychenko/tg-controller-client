@@ -10,7 +10,7 @@ public class DesktopApp {
     public void start() throws Exception {
 
         client = new DesktopClient();
-        client.connect("ws://localhost:8181/ws", "CLIENT_001");
+        client.connect("ws://localhost:8484/ws", "CLIENT_001");
 
         setupTrayIcon();
 

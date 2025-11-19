@@ -156,6 +156,7 @@ public class DesktopClient {
             if (session != null) session.close();
             reconnectExecutor.shutdownNow();
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }

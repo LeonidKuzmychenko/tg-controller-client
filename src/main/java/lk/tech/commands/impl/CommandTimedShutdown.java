@@ -13,7 +13,7 @@ public class CommandTimedShutdown extends AbstractCommand {
 //        } catch (IOException e) {
 //            return null;
 //        }
-        return new Answer(command, null);
+        return new Answer(command, "Success");
     }
 
     @Override
