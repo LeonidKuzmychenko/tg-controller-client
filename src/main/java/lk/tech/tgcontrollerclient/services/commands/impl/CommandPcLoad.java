@@ -8,6 +8,8 @@ import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.NetworkIF;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +33,7 @@ public class CommandPcLoad extends AbstractCommand {
     }
 
     private String getSystemLoad() throws Exception {
+
         // === CPU ===
         CentralProcessor cpu = systemInfo.getHardware().getProcessor();
         long[] prevTicks = cpu.getSystemCpuLoadTicks();
@@ -67,18 +70,11 @@ public class CommandPcLoad extends AbstractCommand {
         long downBytes = rx2 - rx1;
         long upBytes = tx2 - tx1;
 
-        String down = formatBytes(downBytes * 3); // *3 т.к. 300ms → 1 sec
+        String down = formatBytes(downBytes * 3); // 300 ms -> 1 sec
         String up = formatBytes(upBytes * 3);
 
-        // === GPU (если есть) ===
-        String gpuLoad = "N/A";
-        try {
-            var gpus = systemInfo.getHardware().getGraphicsCards();
-            if (!gpus.isEmpty()) {
-                // GPU загрузку OSHI напрямую не даёт → пишем только имя/память
-                gpuLoad = gpus.get(0).getName();
-            }
-        } catch (Exception ignored) {}
+        // === GPU LOAD via WMI ===
+        String gpuLoad = getGpuLoadWindows();
 
         return """
                 CPU: %d%%
@@ -91,6 +87,87 @@ public class CommandPcLoad extends AbstractCommand {
                 gpuLoad,
                 up, down
         );
+    }
+
+    private String getGpuLoadWindows() {
+
+        // --- 1. NVIDIA? — пробуем nvidia-smi ---
+        try {
+            String nvidia = getGpuLoadNvidia();
+            if (!"N/A".equals(nvidia)) {
+                return nvidia;
+            }
+        } catch (Exception ignored) {}
+
+        // --- 2. AMD / Intel / fallback — PowerShell ---
+        try {
+            String ps = getGpuLoadPowerShell();
+            if (!"N/A".equals(ps)) {
+                return ps;
+            }
+        } catch (Exception ignored) {}
+
+        return "N/A";
+    }
+
+    private String getGpuLoadPowerShell() {
+        try {
+            String command = "Get-Counter -Counter \"\\GPU Engine(*)\\Utilization Percentage\" " +
+                            "| Select-Object -ExpandProperty CounterSamples " +
+                            "| Select-Object -ExpandProperty CookedValue";
+
+            ProcessBuilder pb = new ProcessBuilder(
+                    "powershell",
+                    "-Command",
+                    command
+            );
+
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()))
+            ) {
+                List<Integer> values = reader.lines()
+                        .filter(line -> line.matches("\\d+(\\.\\d+)?"))
+                        .map(line -> (int) Math.round(Double.parseDouble(line)))
+                        .toList();
+
+                process.waitFor();
+
+                if (!values.isEmpty()) {
+                    int max = values.stream().max(Integer::compare).orElse(0);
+                    return max + "%";
+                }
+            }
+
+        } catch (Exception ignored) {}
+
+        return "N/A";
+    }
+
+    private String getGpuLoadNvidia() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(
+                    "nvidia-smi",
+                    "--query-gpu=utilization.gpu",
+                    "--format=csv,noheader,nounits"
+            );
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line = r.readLine();
+                process.waitFor();
+
+                if (line != null && line.trim().matches("\\d+")) {
+                    return line.trim() + "%";
+                }
+            }
+        } catch (Exception ignored) {}
+
+        return "N/A";
     }
 
     private String formatBytes(long bytesPerSec) {

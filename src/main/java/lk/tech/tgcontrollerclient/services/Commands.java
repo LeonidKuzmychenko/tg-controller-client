@@ -1,12 +1,9 @@
 package lk.tech.tgcontrollerclient.services;
 
 import lk.tech.tgcontrollerclient.dto.ResultString;
-import lk.tech.tgcontrollerclient.services.commands.impl.CommandPcLoad;
+import lk.tech.tgcontrollerclient.services.commands.impl.*;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
-import lk.tech.tgcontrollerclient.services.commands.impl.CommandScreenshot;
-import lk.tech.tgcontrollerclient.services.commands.impl.CommandShutdown;
-import lk.tech.tgcontrollerclient.services.commands.impl.CommandTimedShutdown;
 import lk.tech.tgcontrollerclient.dto.Result;
 import lk.tech.tgcontrollerclient.dto.ResultImages;
 import reactor.core.publisher.Flux;
@@ -21,10 +18,14 @@ public class Commands {
 
     public Commands() {
         List<AbstractCommand> commands = new ArrayList<>();
-        commands.add(new CommandShutdown());
-        commands.add(new CommandTimedShutdown());
-        commands.add(new CommandScreenshot());
+        commands.add(new CommandInfo());
+        commands.add(new CommandIP());
         commands.add(new CommandPcLoad());
+        commands.add(new CommandProcesses());
+        commands.add(new CommandScreenshot());
+        commands.add(new CommandShutdown());
+        commands.add(new CommandSpeedTest());
+        commands.add(new CommandTemp());
         for (int i = 0; i < commands.size() - 1; i++) {
             commands.get(i).setNext(commands.get(i + 1));
         }

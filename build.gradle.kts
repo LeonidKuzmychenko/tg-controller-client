@@ -23,7 +23,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.oshi:oshi-core:6.4.5")
+//    implementation("com.github.oshi:oshi-core:6.4.5")
+    implementation("com.github.oshi:oshi-core:6.9.1")
     implementation("io.projectreactor.netty:reactor-netty:1.2.11")
     implementation("io.projectreactor:reactor-core:3.7.12")
     implementation("tools.jackson.core:jackson-databind:3.0.2")
