@@ -1,9 +1,11 @@
 package lk.tech.tgcontrollerclient.ui;
 
 import lk.tech.tgcontrollerclient.Main;
-import lk.tech.tgcontrollerclient.utils.KeyManager;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.Closeable;
 import java.util.concurrent.CountDownLatch;
 
@@ -17,88 +19,74 @@ public class UI {
         this.client = client;
     }
 
-    /**
-     * Настройка иконки в системном трее
-     */
     public void setupTrayIcon() throws AWTException {
+        System.out.println("[UI] setupTrayIcon() called");
+
         if (!SystemTray.isSupported()) {
             throw new RuntimeException("System tray not supported!");
         }
 
         SystemTray tray = SystemTray.getSystemTray();
 
-        // загружаем иконку
-        Image image = Toolkit.getDefaultToolkit().createImage(
-                Main.class.getResource("/icon.png")
-        );
-
-        PopupMenu menu = new PopupMenu();
-        addRegenerateKeyItem(menu);
-        addExitMenuItem(menu, tray);
-
-        trayIcon = new TrayIcon(image, "Desktop Control Telegram", menu);
-        trayIcon.setImageAutoSize(true);
-        tray.add(trayIcon);
-    }
-
-    /**
-     * Кнопка перегенерации ключа
-     */
-    private void addRegenerateKeyItem(PopupMenu menu) {
-        MenuItem regenItem = new MenuItem("Regenerate Key");
-
-        regenItem.addActionListener(e -> {
-            try {
-                String newKey = KeyManager.regenerateKey();
-                trayIcon.displayMessage(
-                        "Desktop Control Telegram",
-                        "Новый ключ сгенерирован:\n" + newKey,
-                        TrayIcon.MessageType.INFO
-                );
-                System.out.println("Новый ключ: " + newKey);
-            } catch (Exception ex) {
-                trayIcon.displayMessage(
-                        "Error",
-                        "Не удалось перегенерировать ключ",
-                        TrayIcon.MessageType.ERROR
-                );
-            }
-        });
-
-        menu.add(regenItem);
-    }
-
-    /**
-     * Добавление кнопки Exit в меню TrayIcon
-     */
-    private void addExitMenuItem(PopupMenu menu, SystemTray tray) {
-        MenuItem exitItem = new MenuItem("Exit");
-
-        exitItem.addActionListener(e -> {
-            System.out.println("Shutting down...");
-            shutdown(tray);
-        });
-
-        menu.add(exitItem);
-    }
-
-    /**
-     * Корректное завершение программы
-     */
-    private void shutdown(SystemTray tray) {
-        try {
-            if (client != null) {
-                client.close();
-            }
-            if (trayIcon != null) {
-                tray.remove(trayIcon);
-            }
-        } catch (Exception ignored) {
+        var url = Main.class.getResource("/icon.png");
+        System.out.println("[UI] icon resource = " + url);
+        if (url == null) {
+            throw new RuntimeException("icon.png not found in resources!");
         }
 
-        wait.countDown(); // разблокирует start()
-        System.exit(0);
+        Image image = Toolkit.getDefaultToolkit().createImage(url);
+
+        trayIcon = new TrayIcon(image, "Desktop Control Telegram");
+        trayIcon.setImageAutoSize(true);
+
+        // обработчик кликов
+        trayIcon.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    System.out.println("[Tray] Right click at: " + e.getLocationOnScreen());
+                    showCustomMenu(e);
+                }
+            }
+        });
+
+        tray.add(trayIcon);
+        System.out.println("[UI] Tray icon added");
     }
+    private void showCustomMenu(MouseEvent e) {
+        SwingUtilities.invokeLater(() -> {
+            // Берём реальную позицию мыши
+            PointerInfo pi = MouseInfo.getPointerInfo();
+            Point mouse = pi.getLocation();
+
+            // Размеры меню
+            int menuWidth = 220;
+            int menuHeight = 160;
+
+            // Левый нижний угол меню = точка мыши
+            int x = mouse.x;
+            int y = mouse.y - menuHeight;
+
+            // Корректировка по экрану
+            Rectangle screen = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice()
+                    .getDefaultConfiguration()
+                    .getBounds();
+
+            if (x + menuWidth > screen.x + screen.width)
+                x = screen.x + screen.width - menuWidth - 5;
+
+            if (y < screen.y)
+                y = screen.y + 5;
+
+            Point finalPoint = new Point(x, y);
+
+            Windows11Menu menu = new Windows11Menu(finalPoint, trayIcon, client, wait);
+            menu.showMenu();
+        });
+    }
+
 
     public void await() throws InterruptedException {
         wait.await();
