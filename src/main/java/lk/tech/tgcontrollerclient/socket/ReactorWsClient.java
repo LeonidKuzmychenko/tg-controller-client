@@ -1,8 +1,8 @@
 package lk.tech.tgcontrollerclient.socket;
 
-import lk.tech.tgcontrollerclient.BaseProvider;
-import lk.tech.tgcontrollerclient.commands.Commands;
-import lk.tech.tgcontrollerclient.web.HttpRequests;
+import lk.tech.tgcontrollerclient.utils.BaseProvider;
+import lk.tech.tgcontrollerclient.services.Commands;
+import lk.tech.tgcontrollerclient.utils.SocketUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -10,9 +10,10 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.websocket.WebsocketInbound;
 import reactor.netty.http.websocket.WebsocketOutbound;
 
+import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 
-public class ReactorWsClient {
+public class ReactorWsClient implements Closeable {
 
     private final String url = BaseProvider.socketUrl() + "?key=" + BaseProvider.key();
     private final Commands commands = new Commands();

@@ -1,6 +1,6 @@
-package lk.tech.tgcontrollerclient.commands.impl;
+package lk.tech.tgcontrollerclient.services.commands.impl;
 
-import lk.tech.tgcontrollerclient.commands.AbstractCommand;
+import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 import lk.tech.tgcontrollerclient.dto.Result;
 
 public class CommandTimedShutdown extends AbstractCommand {

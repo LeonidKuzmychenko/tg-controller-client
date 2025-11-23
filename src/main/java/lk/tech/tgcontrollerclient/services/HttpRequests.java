@@ -1,7 +1,7 @@
-package lk.tech.tgcontrollerclient.web;
+package lk.tech.tgcontrollerclient.services;
 
 import io.netty.buffer.ByteBufAllocator;
-import lk.tech.tgcontrollerclient.BaseProvider;
+import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 

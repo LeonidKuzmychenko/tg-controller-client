@@ -1,12 +1,12 @@
-package lk.tech.tgcontrollerclient.commands;
+package lk.tech.tgcontrollerclient.services;
 
-import lk.tech.tgcontrollerclient.BaseProvider;
-import lk.tech.tgcontrollerclient.commands.impl.CommandScreenshot;
-import lk.tech.tgcontrollerclient.commands.impl.CommandShutdown;
-import lk.tech.tgcontrollerclient.commands.impl.CommandTimedShutdown;
+import lk.tech.tgcontrollerclient.utils.BaseProvider;
+import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
+import lk.tech.tgcontrollerclient.services.commands.impl.CommandScreenshot;
+import lk.tech.tgcontrollerclient.services.commands.impl.CommandShutdown;
+import lk.tech.tgcontrollerclient.services.commands.impl.CommandTimedShutdown;
 import lk.tech.tgcontrollerclient.dto.Result;
 import lk.tech.tgcontrollerclient.dto.ResultImages;
-import lk.tech.tgcontrollerclient.web.HttpRequests;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;

@@ -1,7 +1,6 @@
-package lk.tech.tgcontrollerclient.commands;
+package lk.tech.tgcontrollerclient.services.commands;
 
 import lk.tech.tgcontrollerclient.dto.Result;
-import lk.tech.tgcontrollerclient.web.HttpRequests;
 import lombok.Getter;
 import lombok.Setter;
 

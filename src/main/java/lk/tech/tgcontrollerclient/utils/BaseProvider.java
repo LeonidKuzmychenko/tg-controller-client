@@ -1,4 +1,4 @@
-package lk.tech.tgcontrollerclient;
+package lk.tech.tgcontrollerclient.utils;
 
 public class BaseProvider {
 
