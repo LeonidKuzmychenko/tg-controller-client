@@ -1,7 +1,8 @@
 package lk.tech.tgcontrollerclient.socket;
 
 import lk.tech.tgcontrollerclient.commands.Commands;
-import lk.tech.tgcontrollerclient.dto.Answer;
+import lk.tech.tgcontrollerclient.dto.Result;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
@@ -16,6 +17,8 @@ public class ReactorWsClient {
     private final ReconnectManager reconnectManager;
     private final String url;
 
+    private volatile Disposable connection;
+
     public ReactorWsClient(String url) {
         this.url = url;
         this.commands = new Commands();
@@ -23,9 +26,9 @@ public class ReactorWsClient {
     }
 
     public void safeConnect() {
-        System.out.println("[WS] Connecting…");
+        IO.println("[WS] Connecting...");
 
-        HttpClient.create()
+        connection = HttpClient.create()
                 .websocket(SocketUtils.websocketClientSpec())
                 .uri(url)
                 .handle(this::handle)
@@ -33,29 +36,29 @@ public class ReactorWsClient {
                 .subscribe();
     }
 
-    public Mono<Void> handle(WebsocketInbound in, WebsocketOutbound out) {
-        System.out.println("[WS] Connected!");
-        in.receive()
+    private Mono<Void> handle(WebsocketInbound in, WebsocketOutbound out) {
+        IO.println("[WS] Connected!");
+
+        return in.receive()
                 .asByteArray()
                 .publishOn(Schedulers.boundedElastic())
-                .subscribe(
-                        this::onSuccess,
-                        this::onError,
-                        reconnectManager::scheduleReconnect
-                );
-
-        return Mono.never();
+                .doOnNext(this::onSuccess)
+                .doOnError(this::onError)
+                .then();
     }
 
-    public void onError(Throwable throwable) {
-        System.out.println("[WS] ERROR: " + throwable);
+    private void onError(Throwable error) {
+        IO.println("[WS] ERROR: " + error);
+        if (connection != null) {
+            connection.dispose();
+        }
         reconnectManager.scheduleReconnect();
     }
 
     private void onSuccess(byte[] bytes) {
         String text = new String(bytes, StandardCharsets.UTF_8);
-        System.out.println("[WS] TEXT: " + text);
-        Answer answer = commands.analyze(text);
-        System.out.println("[WS] ANSWER: " + answer);
+        IO.println("[WS] REQUEST: " + text);
+        Result result = commands.analyze(text);
+        IO.println("[WS] RESULT: " + result);
     }
 }

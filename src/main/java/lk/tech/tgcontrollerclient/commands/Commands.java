@@ -1,10 +1,9 @@
 package lk.tech.tgcontrollerclient.commands;
 
-import lk.tech.tgcontrollerclient.commands.impl.AbstractCommand;
 import lk.tech.tgcontrollerclient.commands.impl.CommandScreenshot;
 import lk.tech.tgcontrollerclient.commands.impl.CommandShutdown;
 import lk.tech.tgcontrollerclient.commands.impl.CommandTimedShutdown;
-import lk.tech.tgcontrollerclient.dto.Answer;
+import lk.tech.tgcontrollerclient.dto.Result;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +23,7 @@ public class Commands {
         this.firstCommand = commands.getFirst();
     }
 
-    public Answer analyze(String command) {
-        System.out.println("Command: " + command);
-        Answer answer = firstCommand.analyze(command);
-        System.out.println("Answer: " + answer);
-        return answer;
+    public Result analyze(String command) {
+        return firstCommand.analyze(command);
     }
 }

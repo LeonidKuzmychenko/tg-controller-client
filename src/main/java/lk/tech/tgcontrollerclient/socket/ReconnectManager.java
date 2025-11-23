@@ -1,6 +1,7 @@
 package lk.tech.tgcontrollerclient.socket;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
@@ -20,7 +21,7 @@ public class ReconnectManager {
     public void scheduleReconnect() {
         if (!reconnecting.compareAndSet(false, true)) return;
 
-        System.out.println("[WS] Reconnecting in 3s…");
+        IO.println("[WS] Reconnecting in 3s...");
 
         scheduler.schedule(() -> {
             reconnecting.set(false);

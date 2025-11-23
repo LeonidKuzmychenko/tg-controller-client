@@ -59,10 +59,10 @@ public class ScreenCapture {
 
             byte[] output = baos.toByteArray();
 
-            System.out.println("try to compress: " + output.length);
+            IO.println("try to compress: " + output.length);
 
             if (output.length <= maxBytes) {
-                System.out.println("Compressed to " + output.length + " bytes @ quality=" + quality);
+                IO.println("Compressed to " + output.length + " bytes @ quality=" + quality);
                 return output;
             }
 

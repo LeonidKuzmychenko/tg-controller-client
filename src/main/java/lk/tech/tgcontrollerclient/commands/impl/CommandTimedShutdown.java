@@ -1,11 +1,12 @@
 package lk.tech.tgcontrollerclient.commands.impl;
 
-import lk.tech.tgcontrollerclient.dto.Answer;
+import lk.tech.tgcontrollerclient.commands.AbstractCommand;
+import lk.tech.tgcontrollerclient.dto.Result;
 
 public class CommandTimedShutdown extends AbstractCommand {
 
     @Override
-    public Answer run(String command) {
+    public Result run(String command) {
 //        ProcessBuilder pb = new ProcessBuilder("shutdown", "/s", "/f", "/t", "0");
 //        try {
 //            pb.start();
@@ -13,7 +14,7 @@ public class CommandTimedShutdown extends AbstractCommand {
 //        } catch (IOException e) {
 //            return null;
 //        }
-        return new Answer(command, "Success");
+        return new Result(command, "Success");
     }
 
     @Override

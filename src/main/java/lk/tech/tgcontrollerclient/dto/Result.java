@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Answer {
+public class Result {
     private String command;
     private Object data;
 }
