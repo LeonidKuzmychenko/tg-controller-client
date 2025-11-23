@@ -1,6 +1,7 @@
 package lk.tech.tgcontrollerclient.ui;
 
 import lk.tech.tgcontrollerclient.Main;
+import lk.tech.tgcontrollerclient.utils.KeyManager;
 
 import java.awt.*;
 import java.io.Closeable;
@@ -32,11 +33,39 @@ public class UI {
         );
 
         PopupMenu menu = new PopupMenu();
+        addRegenerateKeyItem(menu);
         addExitMenuItem(menu, tray);
 
         trayIcon = new TrayIcon(image, "Desktop Control Telegram", menu);
         trayIcon.setImageAutoSize(true);
         tray.add(trayIcon);
+    }
+
+    /**
+     * Кнопка перегенерации ключа
+     */
+    private void addRegenerateKeyItem(PopupMenu menu) {
+        MenuItem regenItem = new MenuItem("Regenerate Key");
+
+        regenItem.addActionListener(e -> {
+            try {
+                String newKey = KeyManager.regenerateKey();
+                trayIcon.displayMessage(
+                        "Desktop Control Telegram",
+                        "Новый ключ сгенерирован:\n" + newKey,
+                        TrayIcon.MessageType.INFO
+                );
+                System.out.println("Новый ключ: " + newKey);
+            } catch (Exception ex) {
+                trayIcon.displayMessage(
+                        "Error",
+                        "Не удалось перегенерировать ключ",
+                        TrayIcon.MessageType.ERROR
+                );
+            }
+        });
+
+        menu.add(regenItem);
     }
 
     /**
@@ -74,5 +103,4 @@ public class UI {
     public void await() throws InterruptedException {
         wait.await();
     }
-
 }
