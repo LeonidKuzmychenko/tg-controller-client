@@ -1,5 +1,7 @@
 package lk.tech.tgcontrollerclient.services;
 
+import lk.tech.tgcontrollerclient.dto.ResultString;
+import lk.tech.tgcontrollerclient.services.commands.impl.CommandPcLoad;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 import lk.tech.tgcontrollerclient.services.commands.impl.CommandScreenshot;
@@ -22,6 +24,7 @@ public class Commands {
         commands.add(new CommandShutdown());
         commands.add(new CommandTimedShutdown());
         commands.add(new CommandScreenshot());
+        commands.add(new CommandPcLoad());
         for (int i = 0; i < commands.size() - 1; i++) {
             commands.get(i).setNext(commands.get(i + 1));
         }
@@ -33,10 +36,10 @@ public class Commands {
         Result result = firstCommand.analyze(command);
         System.out.println("Result: " + result);
         switch (result) {
-            case ResultImages resultImages -> Flux.fromIterable(resultImages.getImages()).subscribe(image -> {
-                requests.sendImage(image, BaseProvider.key(), command, result.getStatus()).block();
-            });
-            case Result base -> requests.sendText(BaseProvider.key(), command, base.getStatus()).block();
+            case ResultString res -> requests.sendObject(BaseProvider.key(), command, res).block();
+            case ResultImages res -> Flux.fromIterable(res.getImages())
+                    .subscribe(image -> requests.sendImage(image, BaseProvider.key(), command, result.getStatus()).block());
+            case Result res -> requests.sendText(BaseProvider.key(), command, res.getStatus()).block();
         }
     }
 }

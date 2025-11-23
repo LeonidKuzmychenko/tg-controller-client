@@ -1,14 +1,19 @@
 package lk.tech.tgcontrollerclient.services;
 
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
+import lk.tech.tgcontrollerclient.dto.ResultString;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+import tools.jackson.databind.ObjectMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 public class HttpRequests {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient client;
 
     public HttpRequests() {
@@ -24,6 +29,29 @@ public class HttpRequests {
         return client
                 .post()
                 .uri("/api/v1/answer/text/" + key + "?command=" + command + "&status=" + status)
+                .response()
+                .then();
+    }
+
+    // ---------------- Object ----------------
+    public Mono<Void> sendObject(String key, String command, ResultString result) {
+
+        System.out.println("Sending object");
+
+        String json;
+        try {
+            json = mapper.writeValueAsString(result);
+        } catch (Exception e) {
+            return Mono.error(e);
+        }
+
+        return client
+                .headers(h -> h.add("Content-Type", "application/json"))
+                .post()
+                .uri("/api/v1/answer/object/" + key + "?command=" + command + "&status=" + result.getStatus())
+                .send(Mono.just(json)
+                        .map(s -> Unpooled.wrappedBuffer(s.getBytes(StandardCharsets.UTF_8)))
+                )
                 .response()
                 .then();
     }

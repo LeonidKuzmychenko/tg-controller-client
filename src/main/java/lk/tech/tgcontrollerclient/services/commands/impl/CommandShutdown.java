@@ -3,6 +3,8 @@ package lk.tech.tgcontrollerclient.services.commands.impl;
 import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 import lk.tech.tgcontrollerclient.dto.Result;
 
+import java.io.IOException;
+
 public class CommandShutdown extends AbstractCommand {
 
     @Override
@@ -10,9 +12,9 @@ public class CommandShutdown extends AbstractCommand {
 //        ProcessBuilder pb = new ProcessBuilder("shutdown", "/s", "/f", "/t", "0");
 //        try {
 //            pb.start();
-//            return new Answer("/shutdown", null);
+//            return new Result("Success");
 //        } catch (IOException e) {
-//            return null;
+//            return new Result("Fail");
 //        }
         return new Result("Success");
     }
