@@ -1,7 +1,7 @@
 package lk.tech.tgcontrollerclient;
 
 import lk.tech.tgcontrollerclient.socket.ReactorWsClient;
-import lk.tech.tgcontrollerclient.ui.UI;
+import lk.tech.tgcontrollerclient.ui.UiNew;
 
 public class Main {
 
@@ -9,8 +9,8 @@ public class Main {
         ReactorWsClient client = new ReactorWsClient();
         client.safeConnect();
 
-        UI ui = new UI(client);
-        ui.setupTrayIcon();
-        ui.await();
+        UiNew uiNew = new UiNew(client);
+        uiNew.setupTrayIcon();
+        uiNew.await();
     }
 }
