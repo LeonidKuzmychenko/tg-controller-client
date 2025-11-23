@@ -1,8 +1,12 @@
 package lk.tech.tgcontrollerclient.ui;
 
+import com.formdev.flatlaf.FlatLightLaf; // Импорт FlatLaf
 import lk.tech.tgcontrollerclient.Main;
+import lk.tech.tgcontrollerclient.utils.KeyManager;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,12 +19,30 @@ public class UI {
     private final CountDownLatch wait = new CountDownLatch(1);
     private TrayIcon trayIcon;
 
+    // Используем одну невидимую рамку (invokerFrame) для всех операций Swing, связанных с треем.
+    private final JFrame invokerFrame = new JFrame();
+
     public UI(Closeable client) {
         this.client = client;
+
+        // Настройка невидимой рамки (invokerFrame) один раз в конструкторе
+        invokerFrame.setUndecorated(true);
+        invokerFrame.setOpacity(0); // Делаем полностью невидимым
+        invokerFrame.setType(Window.Type.UTILITY);
+        invokerFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
+    /**
+     * Настройка иконки в системном трее
+     */
     public void setupTrayIcon() throws AWTException {
-        System.out.println("[UI] setupTrayIcon() called");
+        // *** 🔑 Активация FlatLaf для современного вида ***
+        try {
+            // Используем светлую тему FlatLaf. Можно использовать FlatDarkLaf для темной.
+            FlatLightLaf.setup();
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf: " + ex.getMessage());
+        }
 
         if (!SystemTray.isSupported()) {
             throw new RuntimeException("System tray not supported!");
@@ -28,65 +50,155 @@ public class UI {
 
         SystemTray tray = SystemTray.getSystemTray();
 
-        var url = Main.class.getResource("/icon.png");
-        System.out.println("[UI] icon resource = " + url);
-        if (url == null) {
-            throw new RuntimeException("icon.png not found in resources!");
-        }
+        // Загружаем иконку
+        Image image = Toolkit.getDefaultToolkit().createImage(
+                Main.class.getResource("/icon.png")
+        );
 
-        Image image = Toolkit.getDefaultToolkit().createImage(url);
-
+        // TrayIcon создается БЕЗ AWT PopupMenu
         trayIcon = new TrayIcon(image, "Desktop Control Telegram");
         trayIcon.setImageAutoSize(true);
 
-        // обработчик кликов
+        // Добавляем слушателя для ручного отображения Swing-меню
         trayIcon.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    System.out.println("[Tray] Right click at: " + e.getLocationOnScreen());
-                    showCustomMenu(e);
+                // Условие для Windows/Linux (правая кнопка)
+                if (e.isPopupTrigger()) {
+                    showSwingMenu(tray);
+                }
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Условие для macOS (обычно левая кнопка)
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    showSwingMenu(tray);
                 }
             }
         });
 
         tray.add(trayIcon);
-        System.out.println("[UI] Tray icon added");
     }
-    private void showCustomMenu(MouseEvent e) {
-        SwingUtilities.invokeLater(() -> {
-            // Берём реальную позицию мыши
-            PointerInfo pi = MouseInfo.getPointerInfo();
-            Point mouse = pi.getLocation();
 
-            // Размеры меню
-            int menuWidth = 220;
-            int menuHeight = 160;
+    /**
+     * Создание и отображение красивого Swing-меню с корректной позицией
+     */
+    private void showSwingMenu(SystemTray tray) {
+        // Мы уже установили FlatLaf, поэтому системный L&F здесь не нужен.
 
-            // Левый нижний угол меню = точка мыши
-            int x = mouse.x;
-            int y = mouse.y - menuHeight;
+        // 1. Создаем меню
+        JPopupMenu swingMenu = new JPopupMenu();
+        addRegenerateKeyItemSwing(swingMenu);
+        swingMenu.addSeparator();
+        addExitMenuItemSwing(swingMenu, tray);
 
-            // Корректировка по экрану
-            Rectangle screen = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .getDefaultScreenDevice()
-                    .getDefaultConfiguration()
-                    .getBounds();
+        // 2. Получаем точные экранные координаты курсора
+        PointerInfo pointer = MouseInfo.getPointerInfo();
+        Point screenPoint = pointer.getLocation();
 
-            if (x + menuWidth > screen.x + screen.width)
-                x = screen.x + screen.width - menuWidth - 5;
+        // Получаем размеры меню (важно вызвать validate/getPreferredSize после добавления элементов)
+        swingMenu.validate();
+        Dimension menuSize = swingMenu.getPreferredSize();
 
-            if (y < screen.y)
-                y = screen.y + 5;
+        // 3. Расчет позиции для invokerFrame (чтобы меню открылось вверх-влево от курсора)
+        int frameX = (int) (screenPoint.getX() - menuSize.width);
+        int frameY = (int) (screenPoint.getY() - menuSize.height - 2); // -2 для небольшого отступа
 
-            Point finalPoint = new Point(x, y);
+        // 4. Позиционируем невидимый invokerFrame
+        invokerFrame.setLocation(frameX, frameY);
+        invokerFrame.setSize(1, 1);
 
-            Windows11Menu menu = new Windows11Menu(finalPoint, trayIcon, client, wait);
-            menu.showMenu();
+        // Отображаем invokerFrame
+        if (!invokerFrame.isVisible()) {
+            invokerFrame.setVisible(true);
+        }
+
+        // 5. Отображаем меню относительно invokerFrame в позиции (0, 0)
+        swingMenu.show(invokerFrame, 0, 0);
+
+        // 6. Закрытие фрейма после потери фокуса меню
+        swingMenu.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                invokerFrame.setVisible(false); // Скрываем
+            }
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                invokerFrame.setVisible(false);
+            }
         });
     }
 
+    /**
+     * Кнопка перегенерации ключа (Swing-версия)
+     */
+    private void addRegenerateKeyItemSwing(JPopupMenu menu) {
+        JMenuItem regenItem = new JMenuItem("Regenerate Key");
+
+        regenItem.addActionListener(e -> {
+            try {
+                String newKey = KeyManager.regenerateKey();
+                // AWT-сообщения нужно вызывать в потоке EDT или убедиться, что они безопасны.
+                // SwingUtilities.invokeLater гарантирует безопасность потоков при вызове UI.
+                SwingUtilities.invokeLater(() -> {
+                    trayIcon.displayMessage(
+                            "Desktop Control Telegram",
+                            "Новый ключ сгенерирован:\n" + newKey,
+                            TrayIcon.MessageType.INFO
+                    );
+                });
+                System.out.println("Новый ключ: " + newKey);
+            } catch (Exception ex) {
+                SwingUtilities.invokeLater(() -> {
+                    trayIcon.displayMessage(
+                            "Error",
+                            "Не удалось перегенерировать ключ",
+                            TrayIcon.MessageType.ERROR
+                    );
+                });
+            }
+        });
+
+        menu.add(regenItem);
+    }
+
+    /**
+     * Добавление кнопки Exit в меню TrayIcon (Swing-версия)
+     */
+    private void addExitMenuItemSwing(JPopupMenu menu, SystemTray tray) {
+        JMenuItem exitItem = new JMenuItem("Exit");
+
+        exitItem.addActionListener(e -> {
+            System.out.println("Shutting down...");
+            shutdown(tray);
+        });
+
+        menu.add(exitItem);
+    }
+
+
+    /**
+     * Корректное завершение программы
+     */
+    private void shutdown(SystemTray tray) {
+        try {
+            if (client != null) {
+                client.close();
+            }
+            if (trayIcon != null) {
+                tray.remove(trayIcon);
+            }
+            // Удаляем invokerFrame при завершении работы
+            invokerFrame.dispose();
+        } catch (Exception ignored) {
+        }
+
+        wait.countDown(); // разблокирует start()
+        System.exit(0);
+    }
 
     public void await() throws InterruptedException {
         wait.await();
