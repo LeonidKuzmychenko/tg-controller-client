@@ -1,6 +1,7 @@
 package lk.tech.tgcontrollerclient.commands;
 
 import lk.tech.tgcontrollerclient.dto.Result;
+import lk.tech.tgcontrollerclient.web.HttpRequests;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +19,7 @@ public abstract class AbstractCommand {
         if (next != null) {
             return next.analyze(command);
         }
-        return new Result("/unknown", null);
+        return new Result("Unknown");
     }
 
 

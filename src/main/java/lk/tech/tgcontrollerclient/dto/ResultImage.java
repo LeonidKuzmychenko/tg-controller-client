@@ -2,11 +2,13 @@ package lk.tech.tgcontrollerclient.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Result {
-    private String status;
+@EqualsAndHashCode(callSuper = true)
+public class ResultImage extends Result{
+    private byte[] image;
 }

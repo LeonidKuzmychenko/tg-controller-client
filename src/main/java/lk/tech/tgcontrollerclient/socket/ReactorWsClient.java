@@ -1,7 +1,8 @@
 package lk.tech.tgcontrollerclient.socket;
 
+import lk.tech.tgcontrollerclient.BaseProvider;
 import lk.tech.tgcontrollerclient.commands.Commands;
-import lk.tech.tgcontrollerclient.dto.Result;
+import lk.tech.tgcontrollerclient.web.HttpRequests;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -13,17 +14,11 @@ import java.nio.charset.StandardCharsets;
 
 public class ReactorWsClient {
 
-    private final Commands commands;
-    private final ReconnectManager reconnectManager;
-    private final String url;
+    private final String url = BaseProvider.socketUrl() + "?key=" + BaseProvider.key();
+    private final Commands commands = new Commands();
+    private final ReconnectManager reconnectManager = new ReconnectManager(this::safeConnect);
 
     private volatile Disposable connection;
-
-    public ReactorWsClient(String url) {
-        this.url = url;
-        this.commands = new Commands();
-        this.reconnectManager = new ReconnectManager(this::safeConnect);
-    }
 
     public void safeConnect() {
         IO.println("[WS] Connecting...");
@@ -58,7 +53,22 @@ public class ReactorWsClient {
     private void onSuccess(byte[] bytes) {
         String text = new String(bytes, StandardCharsets.UTF_8);
         IO.println("[WS] REQUEST: " + text);
-        Result result = commands.analyze(text);
-        IO.println("[WS] RESULT: " + result);
+        commands.analyze(text);
+    }
+
+    public void close() {
+        IO.println("[WS] Closing WebSocket client...");
+
+        // 1. Отключаем автоматический reconnect
+        reconnectManager.manualClose();
+
+        // 2. Закрываем WebSocket соединение
+        try {
+            if (connection != null && !connection.isDisposed()) {
+                connection.dispose();
+            }
+        } catch (Exception ignored) {}
+
+        IO.println("[WS] Closed.");
     }
 }

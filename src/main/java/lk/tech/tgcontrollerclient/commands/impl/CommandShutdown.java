@@ -14,7 +14,7 @@ public class CommandShutdown extends AbstractCommand {
 //        } catch (IOException e) {
 //            return null;
 //        }
-        return new Result(command, "Success");
+        return new Result("Success");
     }
 
     @Override
