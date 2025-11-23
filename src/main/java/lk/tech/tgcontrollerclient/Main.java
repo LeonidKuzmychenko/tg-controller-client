@@ -4,8 +4,8 @@ import lk.tech.tgcontrollerclient.socket.ReactorWsClient;
 
 public class Main {
     void main() throws Exception {
-        ReactorWsClient client = new ReactorWsClient();
-        client.connect("ws://localhost:8484/ws?key=CLIENT_001");
+        ReactorWsClient client = new ReactorWsClient("ws://localhost:8484/ws?key=CLIENT_001");
+        client.safeConnect();
         Thread.currentThread().join();
     }
 }
