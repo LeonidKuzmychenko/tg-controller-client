@@ -23,7 +23,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.glassfish.tyrus.bundles:tyrus-standalone-client:2.2.1")
+    implementation("io.projectreactor.netty:reactor-netty:1.2.11")
+    implementation("io.projectreactor:reactor-core:3.7.12")
+//    implementation("org.glassfish.tyrus.bundles:tyrus-standalone-client:2.2.1")
     implementation("tools.jackson.core:jackson-databind:3.0.2")
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
