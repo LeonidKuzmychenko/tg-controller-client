@@ -1,11 +1,14 @@
 package lk.tech.tgcontrollerclient.ui;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.io.Closeable;
 
+@Slf4j
 public enum MenuService implements Closeable {
 
     INSTANCE;  // ← singleton
@@ -80,13 +83,13 @@ public enum MenuService implements Closeable {
     @Override
     public void close() {
         try {
-            System.out.println("[Shutdown] Hiding invokerFrame...");
+            log.info("[Shutdown] Hiding invokerFrame...");
             if (invokerFrame != null) {
                 invokerFrame.setVisible(false);
                 invokerFrame.dispose();
             }
         } catch (Exception e) {
-            System.out.println("[Shutdown] Failed hiding invokerFrame: " + e);
+            log.info("[Shutdown] Failed hiding invokerFrame: " + e);
         }
     }
 }

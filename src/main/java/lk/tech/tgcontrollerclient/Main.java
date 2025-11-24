@@ -7,7 +7,7 @@ import lk.tech.tgcontrollerclient.utils.KeyManager;
 
 public class Main {
 
-    void main() throws Exception {
+    public static void main(String[] args) throws Exception {
         KeyManager.INSTANCE.init();
 
         ReactorWsClient.INSTANCE.init();

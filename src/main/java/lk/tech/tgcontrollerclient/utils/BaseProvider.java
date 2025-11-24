@@ -1,5 +1,7 @@
 package lk.tech.tgcontrollerclient.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@Slf4j
 public class BaseProvider {
 
     private static final String socketUrl;
@@ -27,7 +30,7 @@ public class BaseProvider {
 
     public static String key() {
         String key = KeyManager.INSTANCE.key();
-        System.out.println(key);
+        log.info(key);
         return key;
     }
 

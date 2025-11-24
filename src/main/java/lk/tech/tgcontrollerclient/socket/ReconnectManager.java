@@ -1,5 +1,7 @@
 package lk.tech.tgcontrollerclient.socket;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
+@Slf4j
 public enum ReconnectManager implements Closeable {
 
     INSTANCE;
@@ -26,7 +29,7 @@ public enum ReconnectManager implements Closeable {
 
     public void scheduleReconnect() {
         if (manualClose.get()) {
-            IO.println("[WS] Reconnect cancelled — manual close");
+            log.info("[WS] Reconnect cancelled — manual close");
             return;
         }
 
@@ -34,7 +37,7 @@ public enum ReconnectManager implements Closeable {
             return;
         }
 
-        IO.println("[WS] Reconnecting in 3s...");
+        log.info("[WS] Reconnecting in 3s...");
 
         scheduler.schedule(() -> {
             reconnecting.set(false);
@@ -47,14 +50,14 @@ public enum ReconnectManager implements Closeable {
     }
 
     public void reset() {
-        IO.println("[WS] ReconnectManager: reset()");
+        log.info("[WS] ReconnectManager: reset()");
         reconnect(false);
         scheduler = newSingleThreadScheduledExecutor();
     }
 
     @Override
     public void close()  {
-        IO.println("[WS] ReconnectManager: manual close");
+        log.info("[WS] ReconnectManager: manual close");
         reconnect(true);
     }
 

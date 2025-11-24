@@ -3,6 +3,7 @@ package lk.tech.tgcontrollerclient.ui;
 import com.formdev.flatlaf.FlatDarkLaf;
 import lk.tech.tgcontrollerclient.Main;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.io.Closeable;
 import java.net.URL;
 
+@Slf4j
 @NoArgsConstructor
 public enum TrayService implements Closeable {
 
@@ -59,13 +61,13 @@ public enum TrayService implements Closeable {
     @Override
     public void close() {
         try {
-            System.out.println("[Shutdown] Hiding tray icon...");
+            log.info("[Shutdown] Hiding tray icon...");
             if (trayIcon != null) {
                 SystemTray.getSystemTray().remove(trayIcon);
                 trayIcon = null;
             }
         } catch (Exception e) {
-            System.out.println("[Shutdown] Failed to remove tray icon: " + e);
+            log.info("[Shutdown] Failed to remove tray icon: " + e);
         }
     }
 }

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import lk.tech.tgcontrollerclient.dto.ResultString;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import tools.jackson.databind.ObjectMapper;
@@ -11,6 +12,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
+@Slf4j
 public enum HttpRequests {
 
     INSTANCE;
@@ -27,7 +29,7 @@ public enum HttpRequests {
 
     // ---------------- TEXT ----------------
     public Mono<Void> sendText(String key, String command, String status) {
-        System.out.println("Sending text");
+        log.info("Sending text");
         return client
                 .post()
                 .uri("/api/v1/answer/text/" + key + "?command=" + command + "&status=" + status)
@@ -38,7 +40,7 @@ public enum HttpRequests {
     // ---------------- Object ----------------
     public Mono<Void> sendObject(String key, String command, ResultString result) {
 
-        System.out.println("Sending object");
+        log.info("Sending object");
 
         String json;
         try {
@@ -60,7 +62,7 @@ public enum HttpRequests {
 
     // ---------------- IMAGE (PNG) ----------------
     public Mono<Void> sendImage(byte[] image, String key, String command, String status) {
-        System.out.println("Sending image");
+        log.info("Sending image");
         return client
                 .headers(h -> h.add("Content-Type", "image/png"))
                 .post()

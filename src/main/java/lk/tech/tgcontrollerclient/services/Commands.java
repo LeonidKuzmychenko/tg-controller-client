@@ -6,11 +6,13 @@ import lk.tech.tgcontrollerclient.dto.ResultString;
 import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 import lk.tech.tgcontrollerclient.services.commands.impl.*;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public enum Commands {
 
     INSTANCE;  // <--- Singleton
@@ -38,7 +40,7 @@ public enum Commands {
 
     public void analyze(String command) {
         Result result = firstCommand.analyze(command);
-        System.out.println("Result: " + result);
+        log.info("Result: " + result);
 
         switch (result) {
             case ResultString res -> HttpRequests.INSTANCE
