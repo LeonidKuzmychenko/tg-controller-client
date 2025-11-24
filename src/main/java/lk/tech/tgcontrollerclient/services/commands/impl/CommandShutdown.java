@@ -1,9 +1,7 @@
 package lk.tech.tgcontrollerclient.services.commands.impl;
 
-import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 import lk.tech.tgcontrollerclient.dto.Result;
-
-import java.io.IOException;
+import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 
 public class CommandShutdown extends AbstractCommand {
 

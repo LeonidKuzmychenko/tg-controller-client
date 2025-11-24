@@ -11,12 +11,14 @@ import tools.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-public class HttpRequests {
+public enum HttpRequests {
+
+    INSTANCE;
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient client;
 
-    public HttpRequests() {
+    HttpRequests() {
         this.client = HttpClient.create()
                 .baseUrl(BaseProvider.httpUrl())
                 .compress(true)

@@ -1,38 +1,37 @@
 package lk.tech.tgcontrollerclient.socket;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
-public class ReconnectManager {
+public enum ReconnectManager implements Closeable {
 
-    // Флаг: закрыт ли клиент вручную?
+    INSTANCE;
+
     private final AtomicBoolean manualClose = new AtomicBoolean(false);
-
-    // Флаг: выполняется ли сейчас reconnect?
     private final AtomicBoolean reconnecting = new AtomicBoolean(false);
+    private ScheduledExecutorService scheduler;
+    private Runnable reconnectCallback;
 
-    private final ScheduledExecutorService scheduler = newSingleThreadScheduledExecutor();
-    private final Runnable reconnectCallback;
-
-    public ReconnectManager(Runnable reconnectCallback) {
+    public void init(Runnable reconnectCallback) {
         this.reconnectCallback = reconnectCallback;
+        this.scheduler = newSingleThreadScheduledExecutor();
+        manualClose.set(false);
+        reconnecting.set(false);
     }
 
-    /**
-     * Запускает переподключение, если клиент НЕ закрыт вручную,
-     * и если оно ещё не выполняется.
-     */
     public void scheduleReconnect() {
         if (manualClose.get()) {
-            IO.println("[WS] Reconnect cancelled — client manually closed");
+            IO.println("[WS] Reconnect cancelled — manual close");
             return;
         }
 
         if (!reconnecting.compareAndSet(false, true)) {
-            return; // уже запущено
+            return;
         }
 
         IO.println("[WS] Reconnecting in 3s...");
@@ -42,24 +41,31 @@ public class ReconnectManager {
 
             if (!manualClose.get()) {
                 reconnectCallback.run();
-            } else {
-                IO.println("[WS] Reconnect skipped — manually closed");
             }
 
         }, 3, TimeUnit.SECONDS);
     }
 
-    /**
-     * Полностью останавливает возможность reconnect и выключает scheduler.
-     */
-    public void manualClose() {
-        IO.println("[WS] ReconnectManager: manual close");
+    public void reset() {
+        IO.println("[WS] ReconnectManager: reset()");
+        reconnect(false);
+        scheduler = newSingleThreadScheduledExecutor();
+    }
 
-        manualClose.set(true);
+    @Override
+    public void close()  {
+        IO.println("[WS] ReconnectManager: manual close");
+        reconnect(true);
+    }
+
+    private void reconnect(boolean manual) {
+        manualClose.set(manual);
         reconnecting.set(false);
 
         try {
             scheduler.shutdownNow();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+
+        }
     }
 }

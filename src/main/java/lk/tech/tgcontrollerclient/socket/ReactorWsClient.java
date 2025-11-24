@@ -1,8 +1,9 @@
 package lk.tech.tgcontrollerclient.socket;
 
-import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import lk.tech.tgcontrollerclient.services.Commands;
+import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import lk.tech.tgcontrollerclient.utils.SocketUtils;
+import lombok.NoArgsConstructor;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -13,14 +14,44 @@ import reactor.netty.http.websocket.WebsocketOutbound;
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 
-public class ReactorWsClient implements Closeable {
+@NoArgsConstructor
+public enum ReactorWsClient implements Closeable {
 
-    private final String url = BaseProvider.socketUrl() + "?key=" + BaseProvider.key();
-    private final Commands commands = new Commands();
-    private final ReconnectManager reconnectManager = new ReconnectManager(this::safeConnect);
+    INSTANCE;
 
+    private volatile String url = buildUrl();
     private volatile Disposable connection;
 
+    private static String buildUrl() {
+        return BaseProvider.socketUrl() + "?key=" + BaseProvider.key();
+    }
+
+    public void init() {
+        ReconnectManager.INSTANCE.init(this::safeConnect);
+    }
+
+    // -----------------------
+    // URL UPDATE AFTER KEY CHANGE
+    // -----------------------
+    private void updateUrl() {
+        this.url = buildUrl();
+        IO.println("[WS] URL updated: " + url);
+    }
+
+    // -----------------------
+    //  PUBLIC API — RELOAD KEY
+    // -----------------------
+    public void reloadKeyAndReconnect() {
+        IO.println("[WS] Reloading key and reconnecting...");
+        updateUrl();
+        ReconnectManager.INSTANCE.reset();
+        close();
+        safeConnect();
+    }
+
+    // -----------------------
+    //  CONNECT
+    // -----------------------
     public void safeConnect() {
         IO.println("[WS] Connecting...");
 
@@ -43,27 +74,26 @@ public class ReactorWsClient implements Closeable {
                 .then();
     }
 
-    private void onError(Throwable error) {
-        IO.println("[WS] ERROR: " + error);
-        if (connection != null) {
-            connection.dispose();
-        }
-        reconnectManager.scheduleReconnect();
-    }
-
     private void onSuccess(byte[] bytes) {
         String text = new String(bytes, StandardCharsets.UTF_8);
         IO.println("[WS] REQUEST: " + text);
-        commands.analyze(text);
+        Commands.INSTANCE.analyze(text);
     }
 
+    private void onError(Throwable error) {
+        IO.println("[WS] ERROR: " + error);
+
+        if (connection != null) {
+            connection.dispose();
+        }
+
+        ReconnectManager.INSTANCE.scheduleReconnect();
+    }
+
+    @Override
     public void close() {
         IO.println("[WS] Closing WebSocket client...");
 
-        // 1. Отключаем автоматический reconnect
-        reconnectManager.manualClose();
-
-        // 2. Закрываем WebSocket соединение
         try {
             if (connection != null && !connection.isDisposed()) {
                 connection.dispose();

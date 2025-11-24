@@ -1,9 +1,9 @@
 package lk.tech.tgcontrollerclient.services.commands.impl;
 
-import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 import lk.tech.tgcontrollerclient.dto.Result;
 import lk.tech.tgcontrollerclient.dto.ResultImages;
 import lk.tech.tgcontrollerclient.services.ScreenCapture;
+import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 
 import java.util.List;
 

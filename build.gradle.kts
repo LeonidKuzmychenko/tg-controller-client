@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.formdev:flatlaf:3.4")
+    implementation("com.formdev:flatlaf:3.6.2")
     implementation("com.github.oshi:oshi-core:6.9.1")
     implementation("io.projectreactor.netty:reactor-netty:1.2.11")
     implementation("io.projectreactor:reactor-core:3.7.12")

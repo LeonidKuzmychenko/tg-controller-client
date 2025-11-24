@@ -6,7 +6,6 @@ import lk.tech.tgcontrollerclient.services.commands.AbstractCommand;
 
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URL;
 import java.util.Scanner;
 
 public class CommandIP extends AbstractCommand {
