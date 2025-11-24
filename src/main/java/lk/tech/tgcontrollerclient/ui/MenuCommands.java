@@ -23,7 +23,7 @@ public enum MenuCommands {
 
     public void regenerateKey() {
         System.out.println("Regenerate key");
-        KeyManager.regenerateKey();
+        KeyManager.INSTANCE.regenerateKey();
         ReactorWsClient.INSTANCE.reloadKeyAndReconnect();
     }
 

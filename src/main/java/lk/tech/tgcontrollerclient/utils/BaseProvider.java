@@ -26,7 +26,7 @@ public class BaseProvider {
     // ------------ PUBLIC GETTERS ------------
 
     public static String key() {
-        String key = KeyManager.key();
+        String key = KeyManager.INSTANCE.key();
         System.out.println(key);
         return key;
     }

@@ -19,7 +19,7 @@ public enum ReactorWsClient implements Closeable {
 
     INSTANCE;
 
-    private volatile String url = buildUrl();
+    private volatile String url;
     private volatile Disposable connection;
 
     private static String buildUrl() {
@@ -27,6 +27,7 @@ public enum ReactorWsClient implements Closeable {
     }
 
     public void init() {
+        url = buildUrl();
         ReconnectManager.INSTANCE.init(this::safeConnect);
     }
 
