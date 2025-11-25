@@ -1,6 +1,6 @@
 package lk.tech.tgcontrollerclient.ui;
 
-import lk.tech.tgcontrollerclient.socket.ReactorWsClient;
+import lk.tech.tgcontrollerclient.socket.OkHttpWsClient;
 import lk.tech.tgcontrollerclient.socket.ReconnectManager;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import lk.tech.tgcontrollerclient.utils.KeyManager;
@@ -17,14 +17,14 @@ public enum MenuCommands {
     public void shutdown() {
         log.info("Shutdown");
         ReconnectManager.INSTANCE.close();
-        ReactorWsClient.INSTANCE.close();
+        OkHttpWsClient.INSTANCE.close();
         MyUI.INSTANCE.close();
     }
 
     public void regenerateKey() {
         log.info("Regenerate key");
         KeyManager.INSTANCE.regenerateKey();
-        ReactorWsClient.INSTANCE.reloadKeyAndReconnect();
+        OkHttpWsClient.INSTANCE.reloadKeyAndReconnect();
     }
 
     public void copyKey() {

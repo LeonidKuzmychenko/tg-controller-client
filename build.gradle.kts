@@ -2,6 +2,7 @@ plugins {
     java
     application
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("org.beryx.jlink") version "3.1.1"
 }
 
 group = "lk.tech"
@@ -23,10 +24,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.projectreactor.netty:reactor-netty:1.2.11")
-    implementation("io.projectreactor:reactor-core:3.7.12")
-    implementation("com.github.oshi:oshi-core:6.9.1")
-    implementation("tools.jackson.core:jackson-databind:3.0.2")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("ch.qos.logback:logback-classic:1.5.21")
     compileOnly("org.projectlombok:lombok:1.18.42")

@@ -1,14 +1,12 @@
 package lk.tech.tgcontrollerclient.services;
 
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.Unpooled;
 import lk.tech.tgcontrollerclient.dto.ResultString;
 import lk.tech.tgcontrollerclient.utils.BaseProvider;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
-import tools.jackson.databind.ObjectMapper;
+import okhttp3.*;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
@@ -17,60 +15,145 @@ public enum HttpRequests {
 
     INSTANCE;
 
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final HttpClient client;
+    private final OkHttpClient client;
 
     HttpRequests() {
-        this.client = HttpClient.create()
-                .baseUrl(BaseProvider.httpUrl())
-                .compress(true)
-                .responseTimeout(Duration.ofSeconds(10));
+        this.client = new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .writeTimeout(Duration.ofSeconds(10))
+                .readTimeout(Duration.ofSeconds(10))
+                .retryOnConnectionFailure(true)
+                .build();
     }
 
-    // ---------------- TEXT ----------------
-    public Mono<Void> sendText(String key, String command, String status) {
-        log.info("Sending text");
-        return client
-                .post()
-                .uri("/api/v1/answer/text/" + key + "?command=" + command + "&status=" + status)
-                .response()
-                .then();
-    }
-
-    // ---------------- Object ----------------
-    public Mono<Void> sendObject(String key, String command, ResultString result) {
-
-        log.info("Sending object");
-
-        String json;
+    // ==================================================
+    //                   SEND TEXT
+    // ==================================================
+    public void sendText(String key, String command, String status) {
         try {
-            json = mapper.writeValueAsString(result);
+            String url = BaseProvider.httpUrl() +
+                    "/api/v1/answer/text/" + key +
+                    "?command=" + encode(command) +
+                    "&status=" + encode(status);
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(RequestBody.create(new byte[0]))
+                    .build();
+
+            client.newCall(request).enqueue(EMPTY_CALLBACK);
+
         } catch (Exception e) {
-            return Mono.error(e);
+            log.error("[HTTP] sendText error", e);
+        }
+    }
+
+    // ==================================================
+    //                   SEND OBJECT
+    // ==================================================
+    public void sendObject(String key, String command, ResultString result) {
+        try {
+            String json = toJson(result);
+            log.info("Sending object to server: {}", json);
+
+            String url = BaseProvider.httpUrl() +
+                    "/api/v1/answer/object/" + key +
+                    "?command=" + encode(command) +
+                    "&status=" + encode(result.getStatus());
+
+            RequestBody body = RequestBody.create(
+                    json.getBytes(StandardCharsets.UTF_8),
+                    MediaType.parse("application/json")
+            );
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(EMPTY_CALLBACK);
+
+        } catch (Exception e) {
+            log.error("[HTTP] sendObject error", e);
+        }
+    }
+
+    // ==================================================
+    //                   SEND IMAGE (PNG)
+    // ==================================================
+    public void sendImage(byte[] image, String key, String command, String status) {
+        try {
+            String url = BaseProvider.httpUrl() +
+                    "/api/v1/answer/image/" + key +
+                    "?command=" + encode(command) +
+                    "&status=" + encode(status);
+
+            RequestBody body = RequestBody.create(
+                    image,
+                    MediaType.parse("image/png")
+            );
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(EMPTY_CALLBACK);
+
+        } catch (Exception e) {
+            log.error("[HTTP] sendImage error", e);
+        }
+    }
+
+    // ==================================================
+    //                     HELPERS
+    // ==================================================
+
+    private static String encode(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8);
+    }
+
+    // Минимальная ручная JSON сериализация
+    private static String toJson(ResultString r) {
+        return """
+               {"status":"%s","data":"%s"}
+               """.formatted(
+                escape(r.getStatus()),
+                escape(r.getData())
+        );
+    }
+
+    private static String escape(String s) {
+        if (s == null) return "";
+        StringBuilder sb = new StringBuilder(s.length());
+
+        for (char c : s.toCharArray()) {
+            switch (c) {
+                case '\\' -> sb.append("\\\\");
+                case '"'  -> sb.append("\\\"");
+                case '\b' -> sb.append("\\b");
+                case '\f' -> sb.append("\\f");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                default -> {
+                    if (c < 0x20) sb.append(String.format("\\u%04x", (int) c));
+                    else sb.append(c);
+                }
+            }
         }
 
-        return client
-                .headers(h -> h.add("Content-Type", "application/json"))
-                .post()
-                .uri("/api/v1/answer/object/" + key + "?command=" + command + "&status=" + result.getStatus())
-                .send(Mono.just(json)
-                        .map(s -> Unpooled.wrappedBuffer(s.getBytes(StandardCharsets.UTF_8)))
-                )
-                .response()
-                .then();
+        return sb.toString();
     }
 
-    // ---------------- IMAGE (PNG) ----------------
-    public Mono<Void> sendImage(byte[] image, String key, String command, String status) {
-        log.info("Sending image");
-        return client
-                .headers(h -> h.add("Content-Type", "image/png"))
-                .post()
-                .uri("/api/v1/answer/image/" + key + "?command=" + command + "&status=" + status)
-                .send(Mono.just(
-                        ByteBufAllocator.DEFAULT.buffer(image.length).writeBytes(image)
-                ))
-                .response()
-                .then();
-    }
+    // Пустой callback чтобы не спамить
+    private static final Callback EMPTY_CALLBACK = new Callback() {
+        @Override public void onFailure(Call call, IOException e) {
+            log.error("[HTTP] Request failed: {}", e.getMessage());
+        }
+
+        @Override public void onResponse(Call call, Response response) {
+            response.close();
+        }
+    };
 }
