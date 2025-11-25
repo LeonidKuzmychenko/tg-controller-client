@@ -25,8 +25,11 @@ repositories {
 
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("ch.qos.logback:logback-classic:1.5.21")
+    implementation("org.tinylog:tinylog-impl:2.7.0")
+    runtimeOnly("org.tinylog:slf4j-tinylog:2.7.0")
+
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
 }
@@ -37,4 +40,14 @@ tasks.shadowJar {
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
     }
+}
+
+jlink {
+    imageName.set("tg-controller-client")
+    options.set(listOf("--strip-debug", "--compress=2", "--no-header-files", "--no-man-pages"))
+    launcher {
+        name = "tgcontroller"
+        mainClass.set(application.mainClass)
+    }
+    forceMerge("slf4j", "logback")
 }
