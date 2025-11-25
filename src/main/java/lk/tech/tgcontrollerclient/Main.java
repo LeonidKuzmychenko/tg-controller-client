@@ -9,11 +9,9 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         KeyManager.INSTANCE.init();
-
         ReactorWsClient.INSTANCE.init();
         ReactorWsClient.INSTANCE.safeConnect();
 
-        MyUI.INSTANCE.start();
         MyUI.INSTANCE.await();
     }
 }

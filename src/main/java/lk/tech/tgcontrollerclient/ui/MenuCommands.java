@@ -18,8 +18,6 @@ public enum MenuCommands {
         log.info("Shutdown");
         ReconnectManager.INSTANCE.close();
         ReactorWsClient.INSTANCE.close();
-        TrayService.INSTANCE.close();
-        MenuService.INSTANCE.close();
         MyUI.INSTANCE.close();
     }
 
