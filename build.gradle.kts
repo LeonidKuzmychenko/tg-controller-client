@@ -13,6 +13,7 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
+    modularity.inferModulePath.set(true)
 }
 
 application {
@@ -34,20 +35,16 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.42")
 }
 
-tasks.shadowJar {
-    archiveClassifier.set("all")
-    mergeServiceFiles()
-    manifest {
-        attributes["Main-Class"] = application.mainClass.get()
-    }
-}
-
 jlink {
     imageName.set("tg-controller-client")
-    options.set(listOf("--strip-debug", "--compress=2", "--no-header-files", "--no-man-pages"))
+    addOptions(
+        "--strip-debug",
+        "--compress", "2",
+        "--no-header-files",
+        "--no-man-pages"
+    )
     launcher {
-        name = "tgcontroller"
+        name = "tg-controller-client"
         mainClass.set(application.mainClass)
     }
-    forceMerge("slf4j", "logback")
 }
