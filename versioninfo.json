@@ -11,7 +11,7 @@
   "StringFileInfo": {
     "ProductName": "Desktop Control",
     "FileDescription": "Desktop Control Client",
-    "OriginalFilename": "app.exe"
+    "OriginalFilename": "Desktop Control Client.exe"
   },
   "VarFileInfo": {
     "Translation": {
