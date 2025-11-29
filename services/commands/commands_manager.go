@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"awesomeProject/dto"
-	httpSender "awesomeProject/services/http"
-	"awesomeProject/utils"
+	"desktop-tg-client/dto"
+	httpSender "desktop-tg-client/services/http"
+	"desktop-tg-client/utils"
 	"fmt"
 )
 

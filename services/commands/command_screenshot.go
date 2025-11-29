@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"awesomeProject/dto"
 	"bytes"
+	"desktop-tg-client/dto"
 	"fmt"
 	"image/png"
 	"log"

@@ -1,9 +1,9 @@
 package http
 
 import (
-	"awesomeProject/dto"
-	"awesomeProject/utils"
 	"bytes"
+	"desktop-tg-client/dto"
+	"desktop-tg-client/utils"
 	"encoding/json"
 	"fmt"
 	"mime/multipart"

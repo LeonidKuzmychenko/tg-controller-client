@@ -1,8 +1,8 @@
 package ws
 
 import (
-	"awesomeProject/services/commands"
-	"awesomeProject/utils"
+	"desktop-tg-client/services/commands"
+	"desktop-tg-client/utils"
 	"log"
 	"sync/atomic"
 	"time"

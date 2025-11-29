@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"awesomeProject/dto"
+	"desktop-tg-client/dto"
 	"fmt"
 	"io"
 	"net"

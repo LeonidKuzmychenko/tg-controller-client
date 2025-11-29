@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"awesomeProject/services/ws"
-	"awesomeProject/utils"
+	"desktop-tg-client/services/ws"
+	"desktop-tg-client/utils"
 	"fmt"
 	"os"
 

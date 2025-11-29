@@ -3,20 +3,14 @@
 package main
 
 import (
-	"awesomeProject/services/commands"
-	"awesomeProject/services/ws"
-	"awesomeProject/ui"
-	"awesomeProject/utils"
+	"desktop-tg-client/services/commands"
+	"desktop-tg-client/services/ws"
+	"desktop-tg-client/ui"
+	"desktop-tg-client/utils"
 	"log"
 )
 
 func main() {
-	// ОДИНАКОВЫЙ ИНСТАНС
-	if !ensureSingleInstance() {
-		log.Println("[APP] Already running. Exiting...")
-		return
-	}
-
 	// ИНИЦИАЛИЗАЦИЯ KEY MANAGER
 	if err := utils.KM.Init(); err != nil {
 		log.Fatal(err)

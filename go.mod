@@ -1,4 +1,4 @@
-module awesomeProject
+module desktop-tg-client
 
 go 1.25
 
