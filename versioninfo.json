@@ -1,0 +1,22 @@
+{
+  "IconPath": "icon.ico",
+  "FixedFileInfo": {
+    "FileVersion": {
+      "Major": 1,
+      "Minor": 0,
+      "Patch": 0,
+      "Build": 0
+    }
+  },
+  "StringFileInfo": {
+    "ProductName": "Desktop Control",
+    "FileDescription": "Desktop Control Client",
+    "OriginalFilename": "Desktop Control Client.exe"
+  },
+  "VarFileInfo": {
+    "Translation": {
+      "LangID": 1033,
+      "CharsetID": 1200
+    }
+  }
+}
