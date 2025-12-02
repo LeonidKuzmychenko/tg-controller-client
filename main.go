@@ -3,11 +3,11 @@
 package main
 
 import (
-	"desktop-tg-client/services/commands"
-	"desktop-tg-client/services/ws"
-	"desktop-tg-client/ui"
-	"desktop-tg-client/utils"
 	"log"
+	"tg-controller-client/services/commands"
+	"tg-controller-client/services/ws"
+	"tg-controller-client/ui"
+	"tg-controller-client/utils"
 )
 
 func main() {

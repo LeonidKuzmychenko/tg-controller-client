@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"desktop-tg-client/dto"
-	httpSender "desktop-tg-client/services/http"
-	"desktop-tg-client/utils"
 	"fmt"
+	"tg-controller-client/dto"
+	httpSender "tg-controller-client/services/http"
+	"tg-controller-client/utils"
 )
 
 // Commands — аналог Java enum INSTANCE

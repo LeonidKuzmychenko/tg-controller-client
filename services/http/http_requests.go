@@ -2,13 +2,13 @@ package http
 
 import (
 	"bytes"
-	"desktop-tg-client/dto"
-	"desktop-tg-client/utils"
 	"encoding/json"
 	"fmt"
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"tg-controller-client/dto"
+	"tg-controller-client/utils"
 	"time"
 )
 
@@ -40,7 +40,7 @@ func (h *HttpRequests) SendText(key, command, status string) {
 	base := utils.HttpUrl()
 
 	u := fmt.Sprintf(
-		"%s/api/v1/answer/text/%s?command=%s&status=%s",
+		"%s/api/v1/answer/%s?command=%s&status=%s",
 		base,
 		key,
 		url.QueryEscape(command),
@@ -80,7 +80,7 @@ func (h *HttpRequests) SendObject(key, command string, result dto.ResultString) 
 
 	base := utils.HttpUrl()
 	u := fmt.Sprintf(
-		"%s/api/v1/answer/object/%s?command=%s&status=%s",
+		"%s/api/v1/answer/%s?command=%s&status=%s",
 		base,
 		key,
 		url.QueryEscape(command),
@@ -119,7 +119,7 @@ func (h *HttpRequests) SendImagesMultipart(images [][]byte, key, command, status
 	base := utils.HttpUrl()
 
 	u := fmt.Sprintf(
-		"%s/api/v1/answer/images/%s?command=%s&status=%s",
+		"%s/api/v1/answer/%s?command=%s&status=%s",
 		base,
 		key,
 		url.QueryEscape(command),
@@ -131,10 +131,9 @@ func (h *HttpRequests) SendImagesMultipart(images [][]byte, key, command, status
 
 	// добавляем файлы
 	for i, img := range images {
-		fieldName := fmt.Sprintf("image_%d", i)
 		fileName := fmt.Sprintf("image_%d.png", i)
 
-		part, err := writer.CreateFormFile(fieldName, fileName)
+		part, err := writer.CreateFormFile("files", fileName)
 		if err != nil {
 			fmt.Println("[HTTP] CreateFormFile error:", err)
 			return

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"desktop-tg-client/dto"
+	"tg-controller-client/dto"
 )
 
 // AbstractCommand — интерфейс как в Java (analyze, run, condition)

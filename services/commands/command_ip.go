@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"desktop-tg-client/dto"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
+	"tg-controller-client/dto"
 )
 
 type CommandIP struct {

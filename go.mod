@@ -1,4 +1,4 @@
-module desktop-tg-client
+module tg-controller-client
 
 go 1.25
 

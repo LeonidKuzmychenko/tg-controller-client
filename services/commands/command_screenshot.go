@@ -2,11 +2,11 @@ package commands
 
 import (
 	"bytes"
-	"desktop-tg-client/dto"
 	"fmt"
 	"image/png"
 	"log"
 	"sync"
+	"tg-controller-client/dto"
 
 	"github.com/kbinani/screenshot"
 )

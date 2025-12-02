@@ -1,10 +1,10 @@
 package ws
 
 import (
-	"desktop-tg-client/services/commands"
-	"desktop-tg-client/utils"
 	"log"
 	"sync/atomic"
+	"tg-controller-client/services/commands"
+	"tg-controller-client/utils"
 	"time"
 
 	"github.com/gorilla/websocket"

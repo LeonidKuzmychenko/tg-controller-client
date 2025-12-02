@@ -35,7 +35,6 @@ func init() {
 
 func Key() string {
 	key := KM.Key()
-	fmt.Println(key) // аналог логирования
 	return key
 }
 

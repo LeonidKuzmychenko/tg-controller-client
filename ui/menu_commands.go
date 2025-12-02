@@ -1,10 +1,10 @@
 package ui
 
 import (
-	"desktop-tg-client/services/ws"
-	"desktop-tg-client/utils"
 	"fmt"
 	"os"
+	"tg-controller-client/services/ws"
+	"tg-controller-client/utils"
 
 	"github.com/atotto/clipboard"
 	"github.com/getlantern/systray"
